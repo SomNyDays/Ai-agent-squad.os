@@ -6,7 +6,7 @@ Apply `supabase/setup.sql` if it has not already been applied, then apply `supab
 
 ## How scoring works
 
-The Arena awards 10 points for a normal attack, 15 for a squad strike, 100 for each boss defeated, and a 500-point clear bonus for defeating all three bosses. At the end of a run, the browser submits one result with a generated game ID. The database's unique (user, game ID) constraint makes repeat submissions idempotent. Each account has one screen name; screen names are case-insensitively unique. The leaderboard sorts by cumulative points, then wins, then best single-game score.
+The Arena awards 10 points for a normal attack, 15 for a squad strike, 100 for each boss defeated, and a 500-point clear bonus for defeating all three bosses. The Neon Frontier mission map awards 50 points per sector and a 100-point bonus for clearing all three sectors. At the end of each run, the browser submits one result with a generated game ID. The database's unique (user, game ID) constraint makes repeat submissions idempotent. Each account has one screen name; screen names are case-insensitively unique. The leaderboard sorts by cumulative points, then wins, then best single-game score.
 
 The API requires a signed-in Supabase account to save scores. The public leaderboard can be read without signing in. If a user finishes a game while signed out, the result remains on screen and can be retried after signing in.
 
