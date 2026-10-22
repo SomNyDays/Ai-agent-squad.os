@@ -2,12 +2,13 @@
   "name": "ai-agent-squad-os",
   "version": "1.0.0",
   "private": true,
-  "scripts": {"typecheck" "tsc --noEmit",
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
+  "scripts": {
+  "typecheck": "tsc --noEmit",
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start",
+  "lint": "next lint"
+},
   "dependencies": {
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.57.0",
