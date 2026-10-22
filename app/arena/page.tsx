@@ -1,5 +1,5 @@
 "use client";
-import {useEffect,useRef,useState} from "react";
+import {useEffect,useState} from "react";
 type Phase="ready"|"working"|"boss"|"victory"|"defeat";
 type Agent={id:string;name:string;role:string;emoji:string;color:string;hp:number;energy:number;xp:number;status:string};
 const initial:Agent[]=[{id:"pixel",name:"PIXEL",role:"RESEARCHER",emoji:"🔎",color:"#60a5fa",hp:100,energy:100,xp:0,status:"READY"},{id:"nova",name:"NOVA",role:"STRATEGIST",emoji:"🧠",color:"#c084fc",hp:100,energy:100,xp:0,status:"READY"},{id:"byte",name:"BYTE",role:"ENGINEER",emoji:"⚡",color:"#34d399",hp:100,energy:100,xp:0,status:"READY"},{id:"tank",name:"TANK",role:"GUARDIAN",emoji:"🛡️",color:"#fbbf24",hp:100,energy:100,xp:0,status:"READY"}];
