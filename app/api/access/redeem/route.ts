@@ -18,6 +18,9 @@ export async function POST(request: Request) {
   }
 
   try {
+    if (!process.env.ARENA_ACCESS_SECRET || process.env.ARENA_ACCESS_SECRET.length < 32) {
+      throw new Error("ARENA_ACCESS_SECRET must be configured with at least 32 characters.");
+    }
     const admin = createSupabaseAdminClient();
     const {data, error} = await admin.rpc("redeem_arena_invite", {p_code_hash: await hashInviteCode(code)});
     if (error) throw error;
