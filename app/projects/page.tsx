@@ -25,8 +25,6 @@ export default function ProjectsPage() {
   const [persistent, setPersistent] = useState(false);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
-  const [runningTaskId, setRunningTaskId] = useState<number | null>(null);
-  const [runOutputs, setRunOutputs] = useState<Record<number, string>>({});
   const visibleTasks = useMemo(() => tasks.filter((task) => filter === "All" || task.status === filter), [tasks, filter]);
 
   useEffect(() => {
@@ -79,29 +77,6 @@ export default function ProjectsPage() {
     } finally { setBusy(false); }
   };
 
-  const executeTask = async (id: number) => {
-    if (busy) return;
-    setBusy(true);
-    setRunningTaskId(id);
-    try {
-      const response = await fetch(`/api/projects/${id}/execute`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "AI execution failed.");
-      setTasks((current) => current.map((item) => item.id === id ? data.task : item));
-      setRunOutputs((current) => ({ ...current, [id]: data.run.output }));
-      setNotice(`AI run complete: ${data.run.agent_name} · ${data.run.department}. Human approval remains required.`);
-    } catch (error) {
-      setNotice(error instanceof Error ? error.message : "AI execution failed.");
-    } finally {
-      setBusy(false);
-      setRunningTaskId(null);
-    }
-  };
-
   const updateTask = async (id: number, action: Action) => {
     const task = tasks.find((item) => item.id === id);
     if (!task || task.status === "Complete" || busy) return;
@@ -120,7 +95,7 @@ export default function ProjectsPage() {
         return;
       }
       let department = task.department;
-      let status: TaskStatus = task.status;
+      let status = task.status;
       let message = "";
       if (action === "handoff") {
         department = routing[task.department];
@@ -167,7 +142,7 @@ export default function ProjectsPage() {
           <div className="mt-6 rounded-xl border border-cyan-300/10 bg-cyan-300/5 p-4">
             <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-cyan-100"><GitBranch size={16}/> Routing map</div>
             {departments.map(dept=><div key={dept} className="flex items-center gap-2 py-1.5 text-sm"><span className="w-24 text-slate-300">{dept}</span><span className="text-slate-600">→</span><span className="text-cyan-200">{routing[dept]}</span><span className="ml-auto text-xs text-slate-500">{agents[dept]}</span></div>)}
-            <p className="mt-3 text-xs leading-5 text-slate-500">AI execution calls the configured server-side model for one specialist step at a time. Successful work is routed to the next department; Quality never bypasses human approval.</p>
+            <p className="mt-3 text-xs leading-5 text-slate-500">Department handoffs are rule-based in this release. Real AI assignment requires a connected model/tool execution layer.</p>
           </div>
         </div>
         <div>
@@ -185,13 +160,11 @@ export default function ProjectsPage() {
               <p className="mt-3 text-sm leading-6 text-slate-400">{task.detail}</p>
               <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-slate-400"><span className="rounded-lg bg-white/5 px-2.5 py-1.5">Department: {task.department}</span><span className="rounded-lg bg-white/5 px-2.5 py-1.5">Owner: {agents[task.department]}</span></div>
               <div className="mt-4 flex flex-wrap gap-2">
-                <button disabled={busy || task.status==="Complete" || !persistent} onClick={()=>executeTask(task.id)} className="rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-3 py-2 text-xs font-semibold text-cyan-100 hover:bg-cyan-300/15 disabled:opacity-40">{runningTaskId === task.id ? "Running specialist…" : "✦ Run AI specialist"}</button>
                 <button disabled={busy || task.status==="Complete"} onClick={()=>updateTask(task.id,"handoff")} className="inline-flex items-center gap-1.5 rounded-lg border border-violet-300/20 px-3 py-2 text-xs font-semibold text-violet-200 hover:bg-violet-300/10 disabled:opacity-40"><ArrowRightLeft size={14}/> Handoff</button>
                 <button disabled={busy || task.status==="Complete"} onClick={()=>updateTask(task.id,"review")} className="inline-flex items-center gap-1.5 rounded-lg border border-amber-300/20 px-3 py-2 text-xs font-semibold text-amber-200 hover:bg-amber-300/10 disabled:opacity-40"><ShieldCheck size={14}/> Request review</button>
                 <button disabled={busy || task.status==="Complete"} onClick={()=>updateTask(task.id,"revise")} className="rounded-lg border border-rose-300/20 px-3 py-2 text-xs font-semibold text-rose-200 hover:bg-rose-300/10 disabled:opacity-40">↶ Return for revision</button>
                 <button disabled={busy || task.status==="Complete"} onClick={()=>updateTask(task.id,"approve")} className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-300/20 px-3 py-2 text-xs font-semibold text-emerald-200 hover:bg-emerald-300/10 disabled:opacity-40"><CheckCircle2 size={14}/> Approve complete</button>
               </div>
-              {runOutputs[task.id] && <section className="mt-4 rounded-xl border border-cyan-300/20 bg-cyan-300/5 p-4"><h4 className="text-xs font-semibold uppercase tracking-wider text-cyan-100">Latest AI specialist output</h4><pre className="mt-3 whitespace-pre-wrap break-words font-sans text-sm leading-6 text-slate-300">{runOutputs[task.id]}</pre></section>}
               <details className="mt-4 border-t border-white/10 pt-3"><summary className="cursor-pointer text-xs font-semibold text-slate-400">Audit trail · {task.history.length} events</summary><ol className="mt-3 grid gap-2">{task.history.map((event,i)=><li key={i} className="flex gap-2 text-xs leading-5 text-slate-400"><span className="text-violet-300">{String(i+1).padStart(2,"0")}</span><span>{event}</span></li>)}</ol></details>
             </article>)}
             {!loading && visibleTasks.length===0&&<div className="rounded-2xl border border-dashed border-white/10 p-8 text-center text-sm text-slate-500">No tasks match this filter.</div>}
