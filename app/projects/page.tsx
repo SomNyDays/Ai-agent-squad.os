@@ -95,7 +95,7 @@ export default function ProjectsPage() {
         return;
       }
       let department = task.department;
-      let status = task.status;
+      let status: TaskStatus = task.status;
       let message = "";
       if (action === "handoff") {
         department = routing[task.department];
