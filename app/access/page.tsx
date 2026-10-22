@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import {FormEvent, useState} from "react";
-import {useRouter, useSearchParams} from "next/navigation";
+import {useRouter} from "next/navigation";
 
 function safeNext(value: string | null) {
   if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) return "/arena";
@@ -12,7 +12,6 @@ function safeNext(value: string | null) {
 
 export default function AccessPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -29,7 +28,7 @@ export default function AccessPage() {
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Unable to redeem invite.");
-      router.replace(safeNext(searchParams.get("next")));
+      router.replace(safeNext(new URLSearchParams(window.location.search).get("next")));
       router.refresh();
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "Unable to redeem invite.");
