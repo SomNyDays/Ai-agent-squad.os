@@ -2,7 +2,7 @@
   "name": "ai-agent-squad-os",
   "version": "1.0.0",
   "private": true,
-  "scripts": {
+  "scripts": { type check
     "type check":tsc--no emit build
     "dev": "next dev",
     "build": "next build",
