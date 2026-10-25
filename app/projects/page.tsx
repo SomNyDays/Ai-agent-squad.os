@@ -95,6 +95,7 @@ export default function ProjectsPage() {
         return;
       }
       let department = task.department;
+      // Keep the full status union so approval can transition a task to Complete.
       let status: TaskStatus = task.status;
       let message = "";
       if (action === "handoff") {
